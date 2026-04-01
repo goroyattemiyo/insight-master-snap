@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>履歴 | InsightMasterforAndroid</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-soft: #eef4ff;
+      --text: #142033;
+      --muted: #61708a;
+      --primary: #2f6bff;
+      --primary-dark: #2157d8;
+      --border: #d9e3f7;
+      --shadow: 0 16px 40px rgba(28, 53, 107, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #f7f9fd 0%, #eef4ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .app {
+      width: 100%;
+      max-width: 560px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 24px 20px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--primary-dark);
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .hero {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 24px 22px;
+    }
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    h1 { margin: 0; font-size: 28px; letter-spacing: -0.04em; }
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 40px 0;
+    }
+    .history-item {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .item-sns {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 12px;
+    }
+    .item-date {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .item-summary {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .item-metrics {
+      display: flex;
+      gap: 12px;
+    }
+    .item-metric {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .item-metric span {
+      font-weight: 800;
+      color: var(--text);
+    }
+    .clear-button {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      background: white;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      width: min(520px, calc(100vw - 20px));
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(14px);
+      border-radius: 28px;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-around;
+      box-shadow: 0 12px 30px rgba(23, 41, 80, 0.12);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+    .nav-item { text-align: center; font-size: 12px; color: var(--muted); font-weight: 700; cursor: pointer; text-decoration: none; }
+    .nav-item.active { color: var(--primary-dark); }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">InsightMasterforAndroid</div>
+
+    <section class="hero">
+      <div class="eyebrow">HISTORY</div>
+      <h1>分析履歴</h1>
+    </section>
+
+    <div id="historyList"></div>
+    <button id="clearButton" class="clear-button" style="display:none;">履歴をすべて削除</button>
+  </main>
+
+  <nav class="bottom-nav">
+    <a class="nav-item" href="./index.html">ホーム</a>
+    <a class="nav-item active" href="./history.html">履歴</a>
+    <a class="nav-item" href="#">設定</a>
+  </nav>
+
+  <script>
+    const historyList = document.getElementById('historyList');
+    const clearButton = document.getElementById('clearButton');
+
+    function render() {
+      const history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+      if (history.length === 0) {
+        historyList.innerHTML = '<div class="empty">まだ分析履歴がありません。<br>ホームからスクショを選んで分析してみてください。</div>';
+        clearButton.style.display = 'none';
+        return;
+      }
+      clearButton.style.display = 'block';
+      historyList.innerHTML = history.map(item => `
+        <div class="history-item">
+          <div class="item-header">
+            <div class="item-sns">${item.sns}</div>
+            <div class="item-date">${item.date}</div>
+          </div>
+          <div class="item-summary">${item.summary}</div>
+          <div class="item-metrics">
+            <div class="item-metric">表示 <span>${Number(item.views).toLocaleString('ja-JP')}</span></div>
+            <div class="item-metric">いいね <span>${Number(item.likes).toLocaleString('ja-JP')}</span></div>
+            <div class="item-metric">ER <span>${item.engagementRate}%</span></div>
+          </div>
+        </div>
+      `).join('<br style="margin:0;line-height:0;height:0;">');
+    }
+
+    clearButton.addEventListener('click', () => {
+      if (confirm('履歴をすべて削除しますか？')) {
+        localStorage.removeItem('analysisHistory');
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

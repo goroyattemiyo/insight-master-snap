@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
@@ -291,7 +291,7 @@
 
   <nav class="bottom-nav" aria-label="メインナビゲーション">
     <div class="nav-item active">ホーム</div>
-    <div class="nav-item">履歴</div>
+    <a class="nav-item" href="./history.html" style="text-decoration:none;">履歴</a>
     <div class="nav-item">設定</div>
   </nav>
 
@@ -475,6 +475,21 @@
       renderList(nextActions, analysis.actionList);
       analyzeStatus.textContent = `${analysis.sns} の数値をもとに参考分析を生成しました。ER は ${analysis.engagementRate.toFixed(1)}% です。`;
       analyzeStatus.className = 'status';
+
+      // 履歴をlocalStorageに保存
+      const historyItem = {
+        id: Date.now(),
+        date: new Date().toLocaleString('ja-JP'),
+        sns: analysis.sns,
+        summary: analysis.summary,
+        engagementRate: analysis.engagementRate.toFixed(1),
+        views: analysis.views,
+        likes: analysis.likes
+      };
+      const history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+      history.unshift(historyItem);
+      if (history.length > 50) history.pop();
+      localStorage.setItem('analysisHistory', JSON.stringify(history));
       renderSummaryMetrics(FIELD_DEFS[snsSelect.value]);
     });
 
@@ -482,6 +497,20 @@
     fields.addEventListener('input', () => renderSummaryMetrics(FIELD_DEFS[snsSelect.value]));
 
     renderFields();
+
+    // sessionStorageから数値とSNSを復元
+    const savedSns = sessionStorage.getItem('selectedSns');
+    const savedValues = sessionStorage.getItem('ocrValues');
+    if (savedSns) snsSelect.value = savedSns;
+    if (savedValues) {
+      const values = JSON.parse(savedValues);
+      renderFields();
+      Object.entries(values).forEach(([key, val]) => {
+        const input = document.querySelector(`[data-field="${key}"]`);
+        if (input) input.value = val;
+      });
+      renderSummaryMetrics(FIELD_DEFS[snsSelect.value]);
+    }
   </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
@@ -193,6 +193,10 @@
       font-weight: 700;
     }
     .field-input {
+      width: 100%;
+      word-break: break-all;
+      overflow: hidden;
+      text-overflow: ellipsis;
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 10px 12px;
@@ -293,11 +297,14 @@
       <div class="grid-fields" id="fields"></div>
       <div class="helper">未確定の項目は空欄のまま残ります。あとで分析前に修正できます。</div>
     </section>
+      <section class="card">
+      <button id="toAnalysisButton" class="primary-button" type="button">分析結果へ進む</button>
+    </section>
   </main>
 
   <nav class="bottom-nav" aria-label="メインナビゲーション">
     <div class="nav-item active">ホーム</div>
-    <div class="nav-item">履歴</div>
+    <a class="nav-item" href="./history.html" style="text-decoration:none;">履歴</a>
     <div class="nav-item">設定</div>
   </nav>
 
@@ -371,11 +378,15 @@
 
     function extractByKeywords(text, keywords) {
       const lines = normalizeText(text).split(/\n+/).map(line => line.trim()).filter(Boolean);
-      for (const line of lines) {
+      for (let i = 0; i < lines.length; i++) {
         for (const keyword of keywords) {
-          if (line.toLowerCase().includes(keyword.toLowerCase())) {
-            const match = line.match(/(\d[\d,.]*(?:\.\d+)?\s*[km万億]?)/i);
-            if (match) return parseCompactNumber(match[1]);
+          if (lines[i].toLowerCase().includes(keyword.toLowerCase())) {
+            const sameLineMatch = lines[i].match(/(\d[\d,.]*(?:\.\d+)?\s*[km万億]?)/i);
+            if (sameLineMatch) return parseCompactNumber(sameLineMatch[1]);
+            if (i + 1 < lines.length) {
+              const nextLineMatch = lines[i + 1].match(/^(\d[\d,.]*(?:\.\d+)?\s*[km万億]?)$/i);
+              if (nextLineMatch) return parseCompactNumber(nextLineMatch[1]);
+            }
           }
         }
       }
@@ -479,7 +490,8 @@
       setStatus(ocrStatus, 'OCRを実行中です。画像サイズによっては少し時間がかかります。', 'warn');
       ocrButton.disabled = true;
       try {
-        const result = await Tesseract.recognize(selectedFile, 'jpn+eng', {
+        const result = await Tesseract.recognize(selectedFile, 'jpn', {
+          tessedit_pageseg_mode: '6',
           logger: (m) => {
             if (m.status === 'recognizing text') {
               const progress = Math.round((m.progress || 0) * 100);
@@ -507,7 +519,27 @@
 
     renderFields({});
 
+    const savedData = sessionStorage.getItem('screenshotData');
+    const savedName = sessionStorage.getItem('screenshotName');
+    if (savedData && savedName) {
+      previewImage.src = savedData;
+      previewName.textContent = savedName;
+      preview.classList.add('active');
+      fetch(savedData).then(r => r.blob()).then(blob => {
+        selectedFile = new File([blob], savedName, { type: blob.type });
+        ocrButton.disabled = false;
+        setStatus(pickStatus, '前の画面で選択した画像を引き継ぎました。', 'ok');
+      });
+    }
+
     document.getElementById('toAnalysisButton').addEventListener('click', () => {
+      const values = {};
+      document.querySelectorAll('[data-field]').forEach(input => {
+        const v = input.value.trim();
+        if (v !== '') values[input.dataset.field] = Number(v);
+      });
+      sessionStorage.setItem('ocrValues', JSON.stringify(values));
+      sessionStorage.setItem('selectedSns', snsSelect.value);
       window.location.href = './analysis-result.html';
     });
   </script>

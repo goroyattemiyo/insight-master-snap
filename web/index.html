@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
@@ -304,7 +304,7 @@
 
   <nav class="bottom-nav" aria-label="メインナビゲーション">
     <div class="nav-item active">ホーム</div>
-    <div class="nav-item">履歴</div>
+    <a class="nav-item" href="./history.html" style="text-decoration:none;">履歴</a>
     <div class="nav-item">設定</div>
   </nav>
 
@@ -371,7 +371,14 @@
     });
 
     nextButton.addEventListener('click', () => {
-      window.location.href = './sns-select.html';
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        sessionStorage.setItem('screenshotData', e.target.result);
+        sessionStorage.setItem('screenshotName', file.name);
+        window.location.href = './sns-select.html';
+      };
+      reader.readAsDataURL(file);
     });
   </script>
 </body>
