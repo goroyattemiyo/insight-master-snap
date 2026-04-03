@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>設定 | InsightMasterSnap</title>
+  <style>
+    :root {
+      --surface: #ffffff;
+      --surface-soft: #eef4ff;
+      --text: #142033;
+      --muted: #61708a;
+      --primary: #2f6bff;
+      --primary-dark: #2157d8;
+      --border: #d9e3f7;
+      --danger: #c53d3d;
+      --success: #1f9d61;
+      --shadow: 0 16px 40px rgba(28, 53, 107, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #f7f9fd 0%, #eef4ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .app {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 24px 20px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .topbar { font-size: 20px; font-weight: 800; color: var(--primary-dark); }
+    .hero {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 24px 22px;
+    }
+    .eyebrow { font-size: 12px; font-weight: 800; letter-spacing: 0.12em; color: var(--primary); margin-bottom: 10px; }
+    h1 { margin: 0; font-size: 28px; letter-spacing: -0.04em; }
+    .card {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card-title { margin: 0; font-size: 16px; font-weight: 800; }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .info-row:last-of-type { border-bottom: none; }
+    .info-label { color: var(--muted); font-weight: 700; }
+    .info-value { font-weight: 800; }
+    .danger-button {
+      width: 100%;
+      border: 1px solid var(--danger);
+      border-radius: 16px;
+      padding: 14px;
+      background: white;
+      color: var(--danger);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .status { font-size: 13px; font-weight: 700; min-height: 18px; text-align: center; }
+    .status.ok { color: var(--success); }
+    .helper { font-size: 12px; color: var(--muted); line-height: 1.7; }
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      width: min(440px, calc(100vw - 20px));
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(14px);
+      border-radius: 28px;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-around;
+      box-shadow: 0 12px 30px rgba(23, 41, 80, 0.12);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+    .nav-item { text-align: center; font-size: 12px; color: var(--muted); font-weight: 700; text-decoration: none; }
+    .nav-item.active { color: var(--primary-dark); }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">InsightMasterSnap</div>
+
+    <section class="hero">
+      <div class="eyebrow">SETTINGS</div>
+      <h1>設定</h1>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">アプリ情報</h2>
+      <div class="info-row">
+        <span class="info-label">アプリ名</span>
+        <span class="info-value">InsightMasterSnap</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">バージョン</span>
+        <span class="info-value">1.0.0</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">対応SNS</span>
+        <span class="info-value">Threads / Instagram / X</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">分析エンジン</span>
+        <span class="info-value">Gemini 2.5 Flash Lite</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">データ管理</h2>
+      <div class="info-row">
+        <span class="info-label">保存済み履歴</span>
+        <span class="info-value" id="historyCount">0件</span>
+      </div>
+      <button id="clearHistory" class="danger-button">分析履歴をすべて削除</button>
+      <div id="status" class="status"></div>
+      <div class="helper">削除した履歴は元に戻せません。</div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">使い方</h2>
+      <div class="helper">
+        1. ホームでSNSを選択する<br>
+        2. インサイト画面のスクショを選ぶ<br>
+        3.「AIで分析する」を押す<br>
+        4. 結論・良い点・弱い点・次の一手を確認する<br><br>
+        分析はGemini AIが行います。数値の読み取りに誤りがある場合があります。参考情報としてご活用ください。
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a class="nav-item" href="./index.html">ホーム</a>
+    <a class="nav-item" href="./history.html">履歴</a>
+    <a class="nav-item active" href="./settings.html">設定</a>
+  </nav>
+
+  <script>
+    const hist = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+    document.getElementById('historyCount').textContent = hist.length + '件';
+
+    document.getElementById('clearHistory').addEventListener('click', () => {
+      if (confirm('分析履歴をすべて削除しますか？')) {
+        localStorage.removeItem('analysisHistory');
+        document.getElementById('historyCount').textContent = '0件';
+        const s = document.getElementById('status');
+        s.textContent = '履歴を削除しました。';
+        s.className = 'status ok';
+      }
+    });
+  </script>
+</body>
+</html>
