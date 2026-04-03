@@ -16,9 +16,14 @@ MVP設計完了 → 実装準備
       index.html → sns-select.html → ocr-extract.html → analysis-result.html
 
 ## Next Steps
-1. Threads用テンプレート作成
-2. OCR→数値マッピング
-3. 分析ロジック（ルールベース）
+1. ~~Threads用テンプレート作成~~ ✅ 2026-04-03
+2. ~~OCR→数値マッピング~~ ✅ 2026-04-03
+3. ~~分析ロジック（ルールベース）~~ ✅ 2026-04-03
+
+## 次フェーズ候補（BACKLOGより）
+- Instagramテンプレート対応
+- Xテンプレート対応
+- OCR精度改善
 
 ## MVP完了条件
 - 1枚スクショ → 分析結果表示

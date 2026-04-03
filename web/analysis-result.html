@@ -307,13 +307,14 @@
     const summaryMetrics = document.getElementById('summaryMetrics');
 
     const FIELD_DEFS = {
-      Threads: ['views', 'likes', 'replies', 'reposts', 'quotes'],
+      Threads: ['views', 'interactions', 'likes', 'replies', 'reposts', 'quotes'],
       Instagram: ['views', 'likes', 'replies', 'shares', 'bookmarks'],
       X: ['views', 'likes', 'replies', 'reposts', 'bookmarks']
     };
 
     const LABELS = {
       views: '表示回数',
+      interactions: 'インタラクション合計',
       likes: 'いいね',
       replies: '返信',
       reposts: 'リポスト',
@@ -380,9 +381,70 @@
       const quotes = numberValue('quotes');
       const shares = numberValue('shares');
       const bookmarks = numberValue('bookmarks');
+      const interactions = numberValue('interactions');
 
-      const reactionBase = likes + replies + reposts + quotes + shares + bookmarks;
+      // 概要画面スクショの場合: 個別値がなくインタラクション合計だけ取れるケースに対応
+      const hasIndividual = (likes + replies + reposts + quotes + shares + bookmarks) > 0;
+      const reactionBase = hasIndividual
+        ? likes + replies + reposts + quotes + shares + bookmarks
+        : interactions;
       const engagementRate = views > 0 ? (reactionBase / views) * 100 : 0;
+
+      // ── 概要画面モード（個別値なし）──────────────────────────────
+      if (!hasIndividual && (views > 0 || interactions > 0)) {
+        const followRate = views > 0 ? (follows / views) * 100 : 0;
+        const erState = engagementRate >= 3 ? 'good' : engagementRate >= 1 ? 'mid' : 'low';
+        const followState = followRate >= 0.1 ? 'good' : followRate >= 0.03 ? 'mid' : 'low';
+
+        let summary = '';
+        if (erState === 'good') {
+          summary = 'アカウント全体として反応を集めやすく、コンテンツが届いている状態です。';
+        } else if (erState === 'mid') {
+          summary = '反応は出ていますが、アカウント全体でもう一段伸ばせる余地があります。';
+        } else {
+          summary = '閲覧数に対してインタラクションが少なく、内容の見直しが効きやすい状態です。';
+        }
+
+        const strengthsList = [];
+        const weaknessList = [];
+        const actionList = [];
+
+        if (views >= 10000) {
+          strengthsList.push('閲覧数は十分にあり、アカウントとして発見されやすい状態です。');
+        } else {
+          weaknessList.push('閲覧数がまだ小さく、まず見つけてもらう工夫が必要です。');
+          actionList.push('投稿の冒頭1〜2行を、誰向けかが一瞬で伝わる言葉に変えてみてください。');
+        }
+
+        if (erState === 'good') {
+          strengthsList.push('インタラクション率が高く、読んだ人が反応しやすいコンテンツになっています。');
+        } else if (erState === 'mid') {
+          weaknessList.push('インタラクション率はまだ伸びしろがあります。反応を引き出す一言を意識してみてください。');
+          actionList.push('投稿の締めを質問形や共感を促す形にして、返しやすさを上げてください。');
+        } else {
+          weaknessList.push('インタラクション率が低く、読み流されている可能性があります。');
+          actionList.push('まず冒頭の2行だけを集中して改善し、続きを読みたくなる構成を試してください。');
+        }
+
+        if (follows > 0) {
+          if (followState === 'good') {
+            strengthsList.push('閲覧からフォローにつながりやすく、アカウントの魅力が伝わっています。');
+          } else {
+            weaknessList.push('閲覧数に対してフォロワー増加が控えめです。プロフィールの訴求を見直す余地があります。');
+            actionList.push('プロフィール文に「どんな人向けか」を一言加えると、フォローの判断がしやすくなります。');
+          }
+        }
+
+        if (strengthsList.length === 0) {
+          strengthsList.push('大きく崩れているわけではないので、改善の余地を一つずつ潰していける状態です。');
+        }
+        if (actionList.length === 0) {
+          actionList.push('一度に全部変えず、まず投稿の冒頭だけを変えて反応差を見てください。');
+        }
+
+        return { summary, strengthsList, weaknessList, actionList, engagementRate, views, likes: interactions, sns };
+      }
+      // ── 投稿単体モード（個別値あり）ここから下は既存ロジック ──────
       const saveRate = views > 0 ? (bookmarks / views) * 100 : 0;
       const shareRate = views > 0 ? ((reposts + shares) / views) * 100 : 0;
       const replyRate = views > 0 ? (replies / views) * 100 : 0;

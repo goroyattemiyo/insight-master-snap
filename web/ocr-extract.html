@@ -333,7 +333,8 @@
       quotes: '引用',
       bookmarks: '保存 / ブックマーク',
       shares: 'シェア',
-      follows: 'フォロー',
+      interactions: 'インタラクション合計（概要画面用）',
+      follows: 'フォロワー',
       profileVisits: 'プロフィールアクセス',
       linkClicks: 'リンククリック'
     };
@@ -351,8 +352,9 @@
 
     function parseCompactNumber(raw) {
       if (!raw) return null;
-      const value = String(raw).trim().replace(/,/g, '').toLowerCase();
-      const match = value.match(/^(\d+(?:\.\d+)?)([km万億])?$/i);
+      const value = String(raw).trim().replace(/,/g, '').replace(/，/g, '').toLowerCase();
+      // 小数点付き万単位に対応: 144.9万 → 1449000
+      const match = value.match(/^(\d+(?:\.\d+)?)\s*([km万億])?$/i);
       if (!match) {
         const numeric = Number(value.replace(/[^\d.]/g, ''));
         return Number.isFinite(numeric) ? Math.round(numeric) : null;
@@ -395,12 +397,16 @@
 
     function parseThreads(text) {
       return {
-        views: extractByKeywords(text, ['表示', '閲覧', 'view', 'views']),
+        // 概要画面: 開覧/閲覧（OCR誤読両対応）、万単位対応済み
+        views: extractByKeywords(text, ['開覧', '閲覧', '表示', 'view', 'views']),
+        // 概要画面のインタラクション合計を likes の代替として取得
         likes: extractByKeywords(text, ['いいね', 'like', 'likes']),
         replies: extractByKeywords(text, ['返信', 'reply', 'replies']),
         reposts: extractByKeywords(text, ['リポスト', 'repost', 'reposts', '再投稿']),
         quotes: extractByKeywords(text, ['引用', 'quote', 'quotes']),
-        follows: extractByKeywords(text, ['フォロー', 'follows', 'followers']),
+        // インタラクション合計（概要画面用）
+        interactions: extractByKeywords(text, ['インタラクション', 'interaction', 'interactions']),
+        follows: extractByKeywords(text, ['フォロワー', 'フォロー', 'follows', 'followers']),
         profileVisits: extractByKeywords(text, ['プロフィール', 'profile']),
         linkClicks: extractByKeywords(text, ['リンク', 'click', 'clicks'])
       };
