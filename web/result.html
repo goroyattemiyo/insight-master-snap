@@ -267,13 +267,13 @@
     const errorText = document.getElementById('errorText');
 
     const METRIC_LABELS = {
-    const METRIC_PRIORITY = ['views','reach','impressions','interactions','likes','replies','reposts','shares','bookmarks','quotes','follows','profileVisits','linkClicks'];
       views: '表示回数', reach: 'リーチ', impressions: 'インプレッション',
       likes: 'いいね', replies: '返信', reposts: 'リポスト',
       quotes: '引用', shares: 'シェア', bookmarks: '保存',
       interactions: 'インタラクション', follows: 'フォロワー',
-      profileVisits: 'プロフィール', linkClicks: 'リンク'
+        linkClicks: 'リンク'
     };
+    const METRIC_PRIORITY = ['views','reach','impressions','interactions','likes','replies','reposts','shares','bookmarks','quotes','follows','profileVisits','linkClicks'];
 
     function showError(msg) {
       loadingSection.style.display = 'none';
