@@ -1,17 +1,6 @@
 {
+  "outputDirectory": "web",
   "rewrites": [
-    { "source": "/", "destination": "/web/index.html" },
-    { "source": "/result", "destination": "/web/result.html" },
-    { "source": "/history", "destination": "/web/history.html" },
-    { "source": "/settings", "destination": "/web/settings.html" }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" }
-      ]
-    }
+    { "source": "/api/(.*)", "destination": "/api/$1" }
   ]
 }
