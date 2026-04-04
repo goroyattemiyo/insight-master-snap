@@ -520,9 +520,29 @@
         });
         const text = result && result.data && result.data.text ? result.data.text : '';
         ocrText.value = text.trim();
-        const parsed = parseBySns(snsSelect.value, text);
+        setStatus(ocrStatus, 'OCR完了。Geminiで補正中…', 'warn');
+
+        let correctedText = text.trim();
+        try {
+          const correctRes = await fetch('/api/ocr-correct', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text.trim(), sns: snsSelect.value })
+          });
+          if (correctRes.ok) {
+            const correctData = await correctRes.json();
+            correctedText = correctData.corrected || text.trim();
+            if (!correctData.fallback) {
+              ocrText.value = correctedText;
+            }
+          }
+        } catch (e) {
+          console.warn('Gemini補正スキップ:', e);
+        }
+
+        const parsed = parseBySns(snsSelect.value, correctedText);
         renderFields(parsed);
-        setStatus(ocrStatus, 'OCRが完了しました。候補数値を確認してください。', 'ok');
+        setStatus(ocrStatus, 'OCRと補正が完了しました。候補数値を確認してください。', 'ok');
       } catch (error) {
         setStatus(ocrStatus, 'OCRでエラーが発生しました。画像を変更して再試行してください。', 'error');
       } finally {
@@ -564,4 +584,3 @@
   </script>
 </body>
 </html>
-
