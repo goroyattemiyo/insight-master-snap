@@ -69,3 +69,10 @@
 - 理由: 導線の簡略化・OCR精度の根本解決・保守ファイル数削減
 - スコア: 92/100
 - 削除ファイル: web/sns-select.html, web/ocr-extract.html, web/analysis-result.html, api/ocr-correct.js
+
+## D-014: 複数枚対応・スクショガイド・SNS別プロンプト改善
+- 日付: 2026-04-04
+- 決定: 複数枚画像対応（最大3枚）・SNS別スクショガイド表示・Threads/Instagram/X固有の分析ルールをプロンプトに追加
+- 理由: 初心者がどの画面を撮るか迷わない・複数画面で分析精度向上・ハッシュタグ等のハルシネーション防止
+- スコア: 83/100
+- 変更ファイル: api/gemini.js, web/index.html, web/result.html
