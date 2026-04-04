@@ -35,7 +35,19 @@
       flex-direction: column;
       gap: 18px;
     }
-    .topbar { font-size: 20px; font-weight: 800; color: var(--primary-dark); }
+    .topbar { font-size: 20px; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), #7ca4ff);
+      color: white;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 22px rgba(47, 107, 255, 0.28);
+      font-size: 18px;
+      flex-shrink: 0;
+    }
     .hero {
       background: rgba(255,255,255,0.92);
       border: 1px solid rgba(255,255,255,0.8);
@@ -102,7 +114,7 @@
 </head>
 <body>
   <main class="app">
-    <div class="topbar">InsightMasterSnap</div>
+    <a class="topbar" href="./index.html" style="text-decoration:none;"><div class="brand-badge">✦</div>InsightMasterSnap</a>
 
     <section class="hero">
       <div class="eyebrow">SETTINGS</div>
