@@ -216,7 +216,12 @@
         id: Date.now(),
         date: new Date().toLocaleString('ja-JP'),
         sns,
+        screenType: data.screenType || 'post',
         summary: data.analysis?.summary || '',
+        strengths: data.analysis?.strengths || [],
+        weaknesses: data.analysis?.weaknesses || [],
+        actions: data.analysis?.actions || [],
+        metrics: metrics,
         engagementRate: '—',
         views: viewsVal !== null ? viewsVal : 0,
         likes: likesVal !== null ? likesVal : 0
